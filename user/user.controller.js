@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const {StatusCodes: Codes} = require('http-status-codes');
 const {validateUser} = require('../helpers/validator');
+const userService = require('./user.service');
 
 const router = express.Router();
 

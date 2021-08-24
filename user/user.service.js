@@ -1,9 +1,8 @@
 const db = require('../helpers/database');
 const User = db.User;
 
-
 async function create(user) {
-  user.created_date = (new Date()).toISOString().split('T')[0];
+  user.created_date = new Date().toISOString().split('T')[0];
 
   const newUser = User(user);
   let response = {};
@@ -16,7 +15,11 @@ async function create(user) {
   return response;
 }
 
+async function getUnique(filter) {
+  return User.findOne(filter);
+}
 
 module.exports = {
   create,
+  getUnique,
 };
