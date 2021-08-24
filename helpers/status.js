@@ -1,4 +1,3 @@
-
 function sendSuccess(msg, data = null) {
   if (!data) {
     return {
