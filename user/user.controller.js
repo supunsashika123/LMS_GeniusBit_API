@@ -2,6 +2,9 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const {StatusCodes: Codes} = require('http-status-codes');
 const {validateUser} = require('../helpers/validator');
+const {sendFailed: failed, sendSuccess: success} = require('../helpers/status');
+const {authenticateToken, createToken} = require('../helpers/auth');
+
 const userService = require('./user.service');
 
 const router = express.Router();
@@ -9,7 +12,15 @@ const router = express.Router();
 
 router.post('/signUp', signUp);
 router.post('/signIn', signIn);
+router.get('/', authenticateToken, validate);
 
+
+async function validate(req, res) {
+  const user = await userService.getById(req.user.id, {'password': false});
+  return res.json({
+    'user': user,
+  });
+}
 
 async function signUp(req, res) {
   const newUser = req.body;
