@@ -13,6 +13,50 @@ const router = express.Router();
 router.post('/signUp', signUp);
 router.post('/signIn', signIn);
 router.get('/', authenticateToken, validate);
+router.get('/getFiltered', authenticateToken, getFiltered);
+
+
+async function getFiltered(req, res) {
+  try {
+    const query_params = req.query;
+
+    const page_size = query_params['page_size']?query_params['page_size']:25;
+    let page_index = query_params['page_index']?query_params['page_index']:1;
+    page_index = (+page_index) - 1;
+
+    const search_term = query_params['search_term'];
+
+    const is_expired = query_params.status === 'expired';
+
+    const filter = await getFilter(query_params);
+    console.log(filter);
+
+    const users = await userService.getAll(filter, page_size, page_index, {
+      'first_name': true,
+      'last_name': true,
+      'username': true,
+      'email': true,
+      'al_year': true,
+      'status': true,
+    }, search_term);
+
+
+    if (is_expired) {
+      users.forEach((user) => {
+        user.status = 'expired';
+      });
+    }
+
+    const all_count = (await userService.getAllCount(filter)).length;
+
+    return res.json(success(users.length===0?'no users found for provided criteria':'users queried.', {
+      users: users,
+      page_count: Math.ceil(all_count/page_size),
+    }));
+  } catch (e) {
+    return res.status(Codes.INTERNAL_SERVER_ERROR).send(failed(e.message));
+  }
+}
 
 
 async function validate(req, res) {
