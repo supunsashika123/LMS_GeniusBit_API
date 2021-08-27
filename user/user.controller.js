@@ -13,6 +13,30 @@ router.post('/signUp', signUp);
 router.post('/signIn', signIn);
 router.get('/', authenticateToken, validate);
 router.get('/getFiltered', authenticateToken, getFiltered);
+router.get('/:id', authenticateToken, getById);
+
+
+async function getById(req, res) {
+  const id = req.params.id;
+  if (!isMongoId(id)) return res.status(Codes.BAD_REQUEST).json(failed('Invalid mongoId.'));
+
+  const user = await userService.getById(id, {'password': false});
+
+  if (!user) return res.status(Codes.NOT_FOUND).json(failed('User with id provided does not exists.'));
+
+  const classes = [];
+  for (let i=0; i<user.class_ids.length; i++) {
+    const class_id = user.class_ids[i];
+    const _class = await classService.getById(class_id);
+    classes.push(_class);
+  }
+
+  const copy = {...user}._doc;
+  delete copy.class_ids;
+  copy.classes = classes;
+
+  return res.json(success('User queried.', copy));
+}
 
 async function getFiltered(req, res) {
   try {
