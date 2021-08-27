@@ -9,15 +9,10 @@ const userService = require('./user.service');
 
 const router = express.Router();
 
-const userService = require('./user.service');
-
-const router = express.Router();
-
 router.post('/signUp', signUp);
 router.post('/signIn', signIn);
 router.get('/', authenticateToken, validate);
 router.get('/getFiltered', authenticateToken, getFiltered);
-
 
 async function getFiltered(req, res) {
   try {
