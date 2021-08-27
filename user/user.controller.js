@@ -9,7 +9,6 @@ const userService = require('./user.service');
 
 const router = express.Router();
 
-
 router.post('/signUp', signUp);
 router.post('/signIn', signIn);
 router.get('/', authenticateToken, validate);
