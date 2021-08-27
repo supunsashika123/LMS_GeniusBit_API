@@ -14,7 +14,6 @@ router.post('/signIn', signIn);
 router.get('/', authenticateToken, validate);
 router.get('/getFiltered', authenticateToken, getFiltered);
 
-
 async function getFiltered(req, res) {
   try {
     const query_params = req.query;
