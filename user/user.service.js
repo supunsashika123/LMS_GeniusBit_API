@@ -20,7 +20,7 @@ async function getUnique(filter) {
 }
 
 async function getById(id, project = {}) {
-  return User.findOne({_id: new Object(id)}, project);
+  return User.findOne({ _id: new Object(id) }, project);
 }
 
 module.exports = {
