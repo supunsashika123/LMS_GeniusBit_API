@@ -14,12 +14,12 @@ router.post('/signIn', signIn);
 router.get('/', authenticateToken, validate);
 router.get('/getFiltered', authenticateToken, getFiltered);
 router.put('/reset-password', authenticateToken, resetPassword);
+router.get('/logout', authenticateToken, logout);
 router.get('/:id', authenticateToken, getById);
 
 
 async function getById(req, res) {
   const id = req.params.id;
-  if (!isMongoId(id)) return res.status(Codes.BAD_REQUEST).json(failed('Invalid mongoId.'));
 
   const user = await userService.getById(id, {'password': false});
 
@@ -37,6 +37,41 @@ async function getById(req, res) {
   copy.classes = classes;
 
   return res.json(success('User queried.', copy));
+}
+
+
+async function logout(req, res) {
+  return res.json({});
+}
+
+
+async function getFilter(params) {
+  delete params['page_size'];
+  delete params['page_index'];
+  delete params['search_term'];
+
+  const is_expired = params.status === 'expired';
+  const is_approved = params.status === 'approved';
+
+  const todayDate = new Date();// .toLocaleString('en-US', {timeZone: 'Asia/Colombo'});
+  todayDate.setHours(0);
+  todayDate.setMinutes(0);
+  todayDate.setSeconds(0);
+  todayDate.setMilliseconds(0);
+  const todayDateBack = todayDate.getTime();
+  todayDate.setDate(todayDate.getDate() + 1);
+  const todayDateFor = todayDate.getTime();
+
+  console.log(todayDateBack, todayDateFor);
+
+  if (is_expired) {
+    delete params.status;
+    params.$where = 'this.status === \'approved\' && this.date_to.getTime() < '+todayDateFor; // this.status !== 'pending' &&
+  } else if (is_approved) {
+    params.$where = 'this.date_to !== null && this.date_to.getTime() > '+todayDateBack;
+  }
+
+  return params;
 }
 
 async function getFiltered(req, res) {
@@ -82,18 +117,18 @@ async function getFiltered(req, res) {
 }
 
 async function resetPassword(req, res) {
-  let new_password = req.body['new_pw'];
-  let user_id = req.body['user_id'];
+  const new_password = req.body['new_pw'];
+  const user_id = req.body['user_id'];
 
-  let user = userService.getById(user_id);
-  if(!user) return res.status(Codes.NOT_FOUND).json(failed("User does not found"));
+  const user = userService.getById(user_id);
+  if (!user) return res.status(Codes.NOT_FOUND).json(failed('User does not found'));
 
-  let salt = bcrypt.genSaltSync(parseInt(process.env.SALT_ROUNDS));
+  const salt = bcrypt.genSaltSync(parseInt(process.env.SALT_ROUNDS));
   user.password = bcrypt.hashSync(new_password, salt);
 
-  let updatedUser =  await userService.update(user, user_id);
+  const updatedUser = await userService.update(user, user_id);
 
-  return res.json(success("user has been updated.", updatedUser))
+  return res.json(success('user has been updated.', updatedUser));
 }
 
 async function validate(req, res) {
