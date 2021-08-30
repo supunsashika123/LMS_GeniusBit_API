@@ -13,6 +13,7 @@ router.post('/signUp', signUp);
 router.post('/signIn', signIn);
 router.get('/', authenticateToken, validate);
 router.get('/getFiltered', authenticateToken, getFiltered);
+router.put('/reset-password', authenticateToken, resetPassword);
 
 async function getFiltered(req, res) {
   try {
@@ -56,6 +57,20 @@ async function getFiltered(req, res) {
   }
 }
 
+async function resetPassword(req, res) {
+  let new_password = req.body['new_pw'];
+  let user_id = req.body['user_id'];
+
+  let user = userService.getById(user_id);
+  if(!user) return res.status(Codes.NOT_FOUND).json(failed("User does not found"));
+
+  let salt = bcrypt.genSaltSync(parseInt(process.env.SALT_ROUNDS));
+  user.password = bcrypt.hashSync(new_password, salt);
+
+  let updatedUser =  await userService.update(user, user_id);
+
+  return res.json(success("user has been updated.", updatedUser))
+}
 
 async function validate(req, res) {
   const user = await userService.getById(req.user.id, {'password': false});
