@@ -15,7 +15,7 @@ router.get('/', authenticateToken, validate);
 router.get('/getFiltered', authenticateToken, getFiltered);
 router.put('/reset-password', authenticateToken, resetPassword);
 router.get('/:id', authenticateToken, getById);
-
+router.put('/:id', update);
 
 async function getById(req, res) {
   const id = req.params.id;
@@ -79,6 +79,72 @@ async function getFiltered(req, res) {
   } catch (e) {
     return res.status(Codes.INTERNAL_SERVER_ERROR).send(failed(e.message));
   }
+}
+
+async function update(req, res){
+  let id = req.params.id;
+  console.log("step 1. id"+id);
+
+  const form = formidable({multiples: true});
+  form.parse(req, async function (err, fields, files) {
+      let updated_user = {};
+      let found_user = {};
+      let prev_status = "";
+      console.log("step 2. inside formidiable callback");
+      if(fields){
+          found_user = await userService.getById(id);
+          console.log("step 3. user found by id");
+          if(!found_user) return res.status(Codes.NOT_FOUND).json(failed("provided userid is not valid."));
+
+          updated_user = JSON.parse(fields.payload);
+          console.log("step 4. json parsed");
+
+          prev_status = updated_user['prev_status'];
+          delete updated_user.username;
+          delete updated_user.gender;
+          delete updated_user.al_year;
+      }
+      if(files && files.file){
+          const file_type = getImageType(files.file.type);
+          const new_path = "/var/www/api/uploads/user/"+id+"."+file_type;
+
+          fileSystem.copyFile(files.file.path, new_path, async (err) => {
+              if (err) {
+                  console.log("Error on file upload");
+              }
+              else {
+                  console.log("file uploaded")
+              }
+          });
+          console.log("step 5. file copied");
+
+          updated_user.image = process.env.UPLOAD_PATH+"user/"+id+"."+file_type;
+      }
+
+      if(isUsernameGenerationRequired(prev_status, updated_user.status, found_user.username)) { // prev_status === 'pending' && updated_user.status === 'approved' && found_user.username === ""
+          console.log("step 6. username generation required block");
+
+          updated_user.username = await generateNextUsername(found_user.gender, found_user.al_year);
+
+          console.log("step 7. username generated"+updated_user.username);
+
+          if(!updated_user.username) return res.status(Codes.INTERNAL_SERVER_ERROR).json(failed("there was an error generating username."));
+          updated_user.uid = await getNextUID();
+
+          console.log("step 8. uid generated "+updated_user.uid);
+      }
+
+      updated_user = await userService.update(updated_user, id);
+
+      console.log("step 9. user has been updated");
+      console.log(updated_user);
+
+      if (err) {
+          console.error(err)
+          return res.status(Codes.INTERNAL_SERVER_ERROR).json(failed("unexpected error occurred"));
+      }
+      return res.json(success("User has been updated.", updated_user))
+  })
 }
 
 async function resetPassword(req, res) {
