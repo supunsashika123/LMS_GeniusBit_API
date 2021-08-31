@@ -11,10 +11,36 @@ const router = express.Router();
 
 router.get('/', authenticateToken, getAll);
 router.get('/:id', authenticateToken, validateMID, getById);
-
+router.post('/', authenticateToken, adminOnly, create);
 router.put('/:id', authenticateToken, adminOnly, validateMID, update);
 
+router.delete('/:id', authenticateToken, adminOnly, validateMID, _delete);
+
 module.exports = router;
+
+async function _delete(req, res) {
+  try {
+      let _id = req.params.id;
+      let updated_class = await classService.update({deactivated: true}, _id);
+      return res.json(success("class has been updated.", updated_class))
+  } catch (e) {
+      return res.status(Codes.INTERNAL_SERVER_ERROR).json(failed("unexpected error occurred."));
+  }
+}
+
+async function create(req, res) {
+  try {
+      let new_class = req.body;
+
+      const error = await validateClass(new_class);
+      if(error) return res.status(Codes.INTERNAL_SERVER_ERROR).json(failed(error));
+
+      let created_class =  await classService.create(new_class);
+      return res.json(success("class has been created.", created_class))
+  } catch (e) {
+      return res.status(Codes.INTERNAL_SERVER_ERROR).json(failed("unexpected error occurred."));
+  }
+}
 
 async function getById(req, res) {
     try {
