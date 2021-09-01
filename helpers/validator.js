@@ -42,6 +42,27 @@ async function validateUser({first_name, last_name, address, password, email, sc
   return null;
 }
 
+async function validateClass({year, institute, type, name}) {
+  // year
+  if (!year) return 'Year is required.';
+  const year_string = year.toString();
+  if (!year_string || year_string.trim() === '') return 'Year is required.';
+  if (year_string.length != 4 || isNaN(year)) return 'Invalid year.';
+
+  // institute
+  if (!institute || institute.trim() === '') return 'Institute is required.';
+
+  // type
+  if (!type || type.trim() === '') return 'Type is required.';
+  const types = ['paper', 'revision', 'theory'];
+  if (!types.includes(type)) return 'Invalid type.';
+
+  // year
+  if (!name || name.trim() === '') return 'Name is required.';
+
+  return null;
+}
+
 function hasNumber(text) {
   return /\d/.test(text);
 }
@@ -63,5 +84,6 @@ function validateMongoId(req, res, next) {
 
 module.exports = {
   validateUser,
+  validateClass,
   validateMongoId,
 };
