@@ -139,8 +139,8 @@ async function getFiltered(req, res) {
   try {
     const query_params = req.query;
 
-    const page_size = query_params['page_size']?query_params['page_size']:25;
-    let page_index = query_params['page_index']?query_params['page_index']:1;
+    const page_size = query_params['page_size'] ? query_params['page_size'] : 25;
+    let page_index = query_params['page_index'] ? query_params['page_index'] : 1;
     page_index = (+page_index) - 1;
 
     const search_term = query_params['search_term'];
@@ -168,9 +168,9 @@ async function getFiltered(req, res) {
 
     const all_count = (await userService.getAllCount(filter)).length;
 
-    return res.json(success(users.length===0?'no users found for provided criteria':'users queried.', {
+    return res.json(success(users.length === 0 ? 'no users found for provided criteria' : 'users queried.', {
       users: users,
-      page_count: Math.ceil(all_count/page_size),
+      page_count: Math.ceil(all_count / page_size),
     }));
   } catch (e) {
     return res.status(Codes.INTERNAL_SERVER_ERROR).send(failed(e.message));
@@ -202,7 +202,7 @@ async function getById(req, res) {
 async function signUp(req, res) {
   const newUser = req.body;
 
-  const user = await userService.getUnique({email: req.body.email});
+  const user = await userService.getUnique({ email: req.body.email });
   if (user) return res.status(Codes.NOT_FOUND).json(failed('Email already exists.'));
 
   const error = await validateUser(newUser);
@@ -224,7 +224,7 @@ async function signUp(req, res) {
 }
 
 async function signIn(req, res) {
-  const user = await userService.getUnique({username: req.body.username, status: 'approved'});
+  const user = await userService.getUnique({ username: req.body.username, status: 'approved' });
 
   if (!user) return res.status(Codes.NOT_FOUND).json(failed('Username does not exists.'));
 

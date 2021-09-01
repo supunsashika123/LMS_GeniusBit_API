@@ -46,7 +46,7 @@ async function getUnique(filter) {
 }
 
 async function getById(id, project = {}) {
-  return User.findOne({_id: new Object(id)}, project);
+  return User.findOne({ _id: new Object(id) }, project);
 }
 
 async function getAll(filter = {}, page_size, page_index, project = {}, search_term = null) {

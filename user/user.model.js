@@ -77,6 +77,6 @@ const schema = new Schema({
   versionKey: false,
 });
 
-schema.set('toJSON', {virtuals: true});
+schema.set('toJSON', { virtuals: true });
 
 module.exports = mongoose.model('User', schema);
