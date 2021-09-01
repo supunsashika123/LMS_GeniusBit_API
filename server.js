@@ -21,6 +21,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/user', require('./user/user.controller'));
+app.use('/class', require('./class/class.controller'));
 
 
 app.listen(process.env.PORT, function() {
