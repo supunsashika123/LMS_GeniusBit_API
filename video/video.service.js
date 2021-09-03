@@ -26,3 +26,7 @@ async function update(user,id){
     }
     return response;
 }
+
+async function getAll(filter = {}, project = {}){
+  return Video.find(filter, project).sort({_id: -1});
+}
