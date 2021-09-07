@@ -26,3 +26,7 @@ async function update(user,id){
     }
     return response;
 }
+
+async function getById(id){
+    return Video.findOne({_id: new Object(id)});
+}
