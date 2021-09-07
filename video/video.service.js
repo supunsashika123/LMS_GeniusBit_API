@@ -30,3 +30,7 @@ async function update(user,id){
 async function getAll(filter = {}, project = {}){
   return Video.find(filter, project).sort({_id: -1});
 }
+
+async function getById(id){
+    return Video.findOne({_id: new Object(id)});
+}
