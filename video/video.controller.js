@@ -1,4 +1,5 @@
 router.post('/', authenticateToken, adminOnly, create);
+router.get('/:id', authenticateToken, getById);
 router.get('/getFiltered', authenticateToken, getFiltered);
 
 async function create(req, res) {
@@ -75,4 +76,16 @@ async function getFiltered(req, res) {
       url: true,
   });
   return res.json(success(videos.length === 0 ? 'no videos found for provided criteria' : "videos queried.", videos))
+}
+
+async function getById(req, res) {
+    let id = req.params.id;
+
+    if (!isMongoId(id)) return res.status(Codes.BAD_REQUEST).json(failed("invalid mongoId."));
+
+    let video = await videoService.getById(id);
+
+    if (!video) return res.status(Codes.BAD_REQUEST).json(failed("Video with id provided does not exists."));
+
+    return res.json(success("Video queried.", video))
 }
