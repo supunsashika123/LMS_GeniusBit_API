@@ -2,6 +2,8 @@ const {isEmail, isMongoId} = require('validator');
 const {StatusCodes: Codes} = require('http-status-codes');
 const {sendFailed: failed} = require('../helpers/status');
 
+const classService = require('../class/class.service')
+
 async function validateUser({first_name, last_name, address, password, email, school, mobile, al_year, gender}, isUpdate = false) {
   // first_name
   if (!first_name || first_name.trim() === '') return 'First name is required.';
@@ -82,8 +84,27 @@ function validateMongoId(req, res, next) {
   return res.status(Codes.BAD_REQUEST).json(failed('id is not valid.'));
 }
 
+async function validateVideo(video) {
+  if (!video.title) return 'Title is mandatory';
+  if (!video.url) return 'Url is mandatory';
+  if (!video.expiry_date) return 'Expire date is mandatory';
+
+  if (!video.classes || video.classes.length === 0) return 'At least there should be a one class.';
+
+  for (let i=0; i<video.classes.length; i++) {
+    const _class = video.classes[i];
+    if (!isMongoId(_class)) return 'invalid mongoid provided for class.';
+    const found_class = await classService.findOne(_class);
+    if (!found_class) return 'invalid class id.';
+  }
+
+  return null;
+}
+
+
 module.exports = {
   validateUser,
   validateClass,
   validateMongoId,
+  validateVideo,
 };

@@ -22,6 +22,7 @@ app.use(cors());
 
 app.use('/user', require('./user/user.controller'));
 app.use('/class', require('./class/class.controller'));
+app.use('/video', require('./video/video.controller'));
 
 
 app.listen(process.env.PORT, function() {

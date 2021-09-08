@@ -11,7 +11,6 @@ const schema = new Schema({
     required: true,
   },
   type: {
-    enum: ['paper', 'revision', 'theory'],
     type: String,
     required: true,
   },
