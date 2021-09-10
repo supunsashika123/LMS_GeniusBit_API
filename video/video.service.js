@@ -1,5 +1,5 @@
 async function create(_video) {
-  _video.created_date = (new Date()).toISOString().split('T')[0];
+  _video.created_date = new Date().toISOString().split("T")[0];
 
   const new_video = Video(_video);
   let response = {};
@@ -21,7 +21,7 @@ async function update(user, id) {
   try {
     response = await found_video.save();
   } catch (err) {
-    console.log(err)
+    console.log(err);
     response.error = "There was an issue while updating the user.";
   }
   return response;
