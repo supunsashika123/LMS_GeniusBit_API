@@ -13,6 +13,7 @@ const docService = require('./doc.service');
 const router = express.Router();
 
 router.post('/', authenticateToken, adminOnly, create);
+router.get('/:id', authenticateToken, getById);
 
 module.exports = router;
 
@@ -45,4 +46,9 @@ async function create(req, res) {
     }
     return res.json(success('Doc has been created.', updated_doc ? updated_doc : created_doc));
   });
+}
+async function getById(req, res) {
+  const doc = await docService.getById(req.params.id);
+  if (!doc) return res.status(Codes.BAD_REQUEST).json(failed('Doc with id provided does not exists.'));
+  return res.json(success('Doc queried.', doc));
 }
