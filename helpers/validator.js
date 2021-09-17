@@ -54,11 +54,6 @@ async function validateClass({year, institute, type, name}) {
   // institute
   if (!institute || institute.trim() === '') return 'Institute is required.';
 
-  // type
-  if (!type || type.trim() === '') return 'Type is required.';
-  const types = ['paper', 'revision', 'theory'];
-  if (!types.includes(type)) return 'Invalid type.';
-
   // year
   if (!name || name.trim() === '') return 'Name is required.';
 
