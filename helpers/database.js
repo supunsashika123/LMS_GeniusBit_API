@@ -6,4 +6,5 @@ module.exports = {
   User: require('../user/user.model'),
   Class: require('../class/class.model'),
   Video: require('../video/video.model'),
+  Doc: require('../doc/doc.model'),
 };
