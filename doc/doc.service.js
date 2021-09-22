@@ -21,3 +21,6 @@ async function create(_class){
     }
     return response;
 }
+async function getById(id){
+  return Doc.findOne({_id: new Object(id), deleted: false});
+}
