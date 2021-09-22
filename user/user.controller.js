@@ -323,7 +323,7 @@ async function update(req, res) {
     }
     if (files && files.file) {
       const file_type = getImageType(files.file.type);
-      const new_path = '/var/www/api/uploads/user/'+id+'.'+file_type;
+      const new_path = '/var/www/LMS_GeniusBit_API/uploads/user/'+id+'.'+file_type;
 
       fileSystem.copyFile(files.file.path, new_path, async (err) => {
         if (err) {
