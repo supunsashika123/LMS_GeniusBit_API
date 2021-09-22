@@ -30,7 +30,7 @@ async function create(req, res) {
       created_doc = await docService.create(new_doc);
     }
     if (files) {
-      const new_path = '/var/www/api/uploads/doc/' + created_doc._id + '.pdf';
+      const new_path = '/var/www/LMS_GeniusBit_API/doc/' + created_doc._id + '.pdf';
 
       fileSystem.copyFile(files.file.path, new_path, (err) => {
         if (err) {
